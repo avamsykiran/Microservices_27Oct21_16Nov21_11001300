@@ -18,6 +18,7 @@ Java Microservices on Spring Boot and Spring Cloud
         STS 4 or above 
         Maven
         MySQL
+        Postman
 
     CaseStudy - BudgetTracker
     ----------------------------------------------------------------------
@@ -176,6 +177,40 @@ Java Microservices on Spring Boot and Spring Cloud
                     (Load Balancing Ribbon / Fiegn Client)
                                     
 
+
+    CaseStudy - BudgetTracker - Implmwentation Step1
+    ----------------------------------------------------------------------
+
+     1. in.budgettracker
+        user-management-service
+            spring boot web
+            spring data jpa
+            spring boot devtools
+            open Feign
+            MySQL Driver   
+
+            Method      EndPoint            ReqBody         RespBody
+            GET         /users              NA              a json array of users, HttpStatus.OK
+            GET         /users/1            NA              a json of user with userId=1, HttpStatus.OK
+            GET         /users/a@g.com      NA              a json of user with emailId=a@g.com, HttpStatus.OK
+            POST        /users              user json       add the user and return the user json, HttpStatus.CREATED
+            PUT         /users              user json       update the user and return the user json,
+                                                            HttpStatus.ACCEPTED
+            DELETE      /users/1            NA              delete the user with userId=1, HttpStatus.NO_CONTENT
+    
+     2. in.budgettracker
+        txn-management-service
+            spring boot web
+            spring data jpa
+            spring boot devtools
+            open Feign
+            MySQL Driver   
+
+     3. in.budgettracker
+        reporting-service
+            spring boot web
+            spring boot devtools
+            open Feign
 
 
 
