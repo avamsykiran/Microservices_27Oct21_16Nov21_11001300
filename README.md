@@ -171,10 +171,10 @@ Java Microservices on Spring Boot and Spring Cloud
             USDb <-->    UserManagementService (Sluath) <---> |                                  ↓ 
             TSDb <-->    TransactionService    (Sluath) <---> |  <----->  EdgeService/GateWayService  <--> Client  
                     (fall back mechanisim using Netflix Hystrix / Resiliance4j)  (Zuul / Spring Cloud Gateway) 
-                    (Load Balancing Ribbon / Fiegn Client)
+                    (Ribbon / Spring Cloud LoadBalancer + Feign Cleint)
                          ReportingService      (Sluath) <---> |                                    
                     (fall back mechanisim using Netflix Hystrix / Resiliance4j)                                
-                    (Load Balancing Ribbon / Fiegn Client)
+                    (Ribbon / Spring Cloud LoadBalancer + Feign Cleint)
                                     
 
 
