@@ -50,6 +50,12 @@ public class UserModel {
 	public void setCurrentBal(Double currentBal) {
 		this.currentBal = currentBal;
 	}
+
+	@Override
+	public String toString() {
+		return "UserModel [userId=" + userId + ", fullName=" + fullName + ", emailId=" + emailId + ", currentBal="
+				+ currentBal + "]";
+	}
 	
 	
 	
