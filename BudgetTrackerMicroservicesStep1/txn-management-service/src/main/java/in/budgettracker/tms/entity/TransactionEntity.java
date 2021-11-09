@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.DateTimeFormat.ISO;
@@ -30,22 +31,22 @@ public class TransactionEntity implements Comparable<TransactionEntity> {
 	private TransactionType txnType;
 	
 	@ManyToOne
-	@JoinColumn(name="monthId")
-	private DayBookEntity dayBook;
+	@JoinColumn(name="userId")
+	private UserEntity holder;
 	
 	public TransactionEntity() {
 		// TODO Auto-generated constructor stub
 	}
 
 	public TransactionEntity(Long txnId, String header, LocalDateTime dateAndTime, Double amount,
-			TransactionType txnType, DayBookEntity dayBook) {
+			TransactionType txnType, UserEntity holder) {
 		super();
 		this.txnId = txnId;
 		this.header = header;
 		this.dateAndTime = dateAndTime;
 		this.amount = amount;
 		this.txnType = txnType;
-		this.dayBook = dayBook;
+		this.holder = holder;
 	}
 
 	public Long getTxnId() {
@@ -88,17 +89,18 @@ public class TransactionEntity implements Comparable<TransactionEntity> {
 		this.txnType = txnType;
 	}
 
-	public DayBookEntity getDayBook() {
-		return dayBook;
+	public UserEntity getHolder() {
+		return holder;
 	}
 
-	public void setDayBook(DayBookEntity dayBook) {
-		this.dayBook = dayBook;
+	public void setHolder(UserEntity holder) {
+		this.holder = holder;
 	}
 
 	@Override
-	public int compareTo(TransactionEntity o) {
-		return txnId.compareTo(o.txnId);
+	public int compareTo(TransactionEntity arg0) {
+		return this.txnId.compareTo(arg0.txnId);
 	}
+
 	
 }

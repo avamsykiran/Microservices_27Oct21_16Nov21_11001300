@@ -21,17 +21,17 @@ public class UserEntity {
 	private Double currentBal;
 	
 	@OneToMany(mappedBy = "holder",cascade = CascadeType.ALL,fetch = FetchType.LAZY)
-	private Set<DayBookEntity> dayBooks;
+	private Set<TransactionEntity> txns;
 	
 	public UserEntity() {
 		// TODO Auto-generated constructor stub
 	}
 
-	public UserEntity(Long userId, Double currentBal, Set<DayBookEntity> dayBooks) {
+	public UserEntity(Long userId, Double currentBal, Set<TransactionEntity> txns) {
 		super();
 		this.userId = userId;
 		this.currentBal = currentBal;
-		this.dayBooks = dayBooks;
+		this.txns = txns;
 	}
 
 	public Long getUserId() {
@@ -50,11 +50,12 @@ public class UserEntity {
 		this.currentBal = currentBal;
 	}
 
-	public Set<DayBookEntity> getDayBooks() {
-		return dayBooks;
+	public Set<TransactionEntity> getTxns() {
+		return txns;
 	}
 
-	public void setDayBooks(Set<DayBookEntity> dayBooks) {
-		this.dayBooks = dayBooks;
+	public void setTxns(Set<TransactionEntity> txns) {
+		this.txns = txns;
 	}
+
 }
