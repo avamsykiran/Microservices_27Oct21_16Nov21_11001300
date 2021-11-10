@@ -44,24 +44,22 @@ Java Microservices on Spring Boot and Spring Cloud
                             userId,fullName,email,mobile,password
 
                 TransactionService
-                        UserTSModel
+                        UserEntity
                             userId
+                            currentBalance
 
                         TransactionEntity
-                            txnId,userId,amount,txnType,dateTimeOfTxn
+                            txnId,amount,txnType,dateTimeOfTxn,user
 
-                        MonthlySummaryEntity
-                            monthId,opBal,clBal,totalCredit,totalDebit
+                        UserModel
+                            userId,fullName,email,mobile,password,currentBalance
 
                 ReportingService
-                        UserRSModel
-                            userId,fullName,email,mobile
-                        
-                        MonthlySummaryModel
-                            monthId,opBal,clBal,totalCredit,totalDebit
+                        MonthlyStatement
+                            month,year,totalCredit,totalDebit,monthlyBalance
 
                         TransactionModel
-                            txnId,userId,amount,txnType,dateTimeOfTxn
+                            txnId,amount,txnType,dateTimeOfTxn
 
             Integration Pattern - API Gateway Pattern, Aggregator Patterns
             ------------------------------------------------------------
@@ -175,8 +173,6 @@ Java Microservices on Spring Boot and Spring Cloud
                          ReportingService      (Sluath) <---> |                                    
                     (fall back mechanisim using Netflix Hystrix / Resiliance4j)                                
                     (Ribbon / Spring Cloud LoadBalancer + Feign Cleint)
-                                    
-
 
     CaseStudy - BudgetTracker - Implmwentation Step1
     ----------------------------------------------------------------------
@@ -206,15 +202,128 @@ Java Microservices on Spring Boot and Spring Cloud
             open Feign
             MySQL Driver   
 
+            Method      EndPoint                     ReqBody         RespBody
+            GET         /users/1                     NA              a json of user with userId=1, HttpStatus.OK
+            GET         /users/1/txns                NA              a json array of all transaction of that user
+            GET         /users/1/txns/MAY/2021       NA              a json array of all transaction of that user 
+                                                                     in  that month
+            POST        /users                       user json       add the user and return the user json,
+                                                                     HttpStatus.CREATED
+            GET         /txns/1                      NA              a json of txn with txnId=1, HttpStatus.OK
+            DELETE      /txns/1                      NA              delete txn with txnId=1, HttpStatus.NO_CONTENT
+            POST        /txns                        txn json        add the txn and return the user json,
+                                                                     HttpStatus.CREATED   
      3. in.budgettracker
         reporting-service
             spring boot web
             spring boot devtools
             open Feign
 
-
-
-
-            
-
+            Method      EndPoint                    RespBody
+            GET         /statement/1/MAY/2021       a json monthlyStatement the  user#1
+                                                    of  that month, HttpStatus.OK
     
+    CaseStudy - BudgetTracker - Implmwentation Step2 - Discovery Service + Client Side Load Balancing
+    --------------------------------------------------------------------------------------------------
+
+    A. in.budgettracket
+        bt-discovery-service
+            spring boot devtools
+            spring-cloud-starter-netflix-eureka-server
+
+            @EnableEurekaServer      along with @SpringBootAppliction 
+            
+            spring.application.name=bt-discovery-service
+            server.port=9000
+            eureka.instance.hostname= localhost
+            eureka.client.registerWithEureka=false
+            eureka.client.fetchRegistry=false
+            eureka.client.serviceUrl.defaultZone=http://${eureka.instance.hostname}:${server.port}/eureka/
+            eureka.server.waitTimeInMsWhenSyncEmpty=0
+            eureka.server.response-cache-update-interval-ms=5000
+
+     1. in.budgettracker
+        user-management-service
+            spring boot web
+            spring data jpa
+            spring boot devtools
+            open Feign
+            MySQL Driver   
+            spring-cloud-starter-netflix-eureka-client
+            spring-cloud-starter-loadbalancer
+
+            @EnableDiscoveryClient      along with @SpringBootAppliction 
+            @LoadBalancerClient         along with @FeignClient
+
+            spring.application.name=user-management-service
+            #enable random port
+            server.port=0
+
+            spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+            spring.datasource.username=root
+            spring.datasource.password=root
+            spring.datasource.url=jdbc:mysql://localhost:3306/btumsDB?createDatabaseIfNotExist=true
+            spring.jpa.hibernate.ddl-auto=update
+
+            eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+            eureka.client.initialInstanceInfoReplicationIntervalSeconds=5
+            eureka.client.registryFetchIntervalSeconds=5
+            eureka.instance.leaseRenewalIntervalInSeconds=5
+            eureka.instance.leaseExpirationDurationInSeconds=5
+
+            spring.cloud.loadbalancer.ribbon.enabled=false
+
+     2. in.budgettracker
+        txn-management-service
+            spring boot web
+            spring data jpa
+            spring boot devtools
+            open Feign
+            MySQL Driver   
+            spring-cloud-starter-netflix-eureka-client
+            spring-cloud-starter-loadbalancer
+
+            @EnableDiscoveryClient      along with @SpringBootAppliction 
+            @LoadBalancerClient         along with @FeignClient
+
+                spring.application.name=txn-management-service
+                #enable random port
+                server.port=0
+
+                spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+                spring.datasource.username=root
+                spring.datasource.password=root
+                spring.datasource.url=jdbc:mysql://localhost:3306/bttmsDB?createDatabaseIfNotExist=true
+                spring.jpa.hibernate.ddl-auto=update
+
+                eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+                eureka.client.initialInstanceInfoReplicationIntervalSeconds=5
+                eureka.client.registryFetchIntervalSeconds=5
+                eureka.instance.leaseRenewalIntervalInSeconds=5
+                eureka.instance.leaseExpirationDurationInSeconds=5
+
+                spring.cloud.loadbalancer.ribbon.enabled=false
+
+     3. in.budgettracker
+        reporting-service
+            spring boot web
+            spring boot devtools
+            open Feign
+            spring-cloud-starter-netflix-eureka-client
+            spring-cloud-starter-loadbalancer
+
+            @EnableDiscoveryClient      along with @SpringBootAppliction 
+            @LoadBalancerClient         along with @FeignClient
+
+                spring.application.name=reporting-service
+                #enable random port
+                server.port=0
+
+
+                eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+                eureka.client.initialInstanceInfoReplicationIntervalSeconds=5
+                eureka.client.registryFetchIntervalSeconds=5
+                eureka.instance.leaseRenewalIntervalInSeconds=5
+                eureka.instance.leaseExpirationDurationInSeconds=5
+
+                spring.cloud.loadbalancer.ribbon.enabled=false
