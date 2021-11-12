@@ -256,8 +256,7 @@ Java Microservices on Spring Boot and Spring Cloud
             @LoadBalancerClient         along with @FeignClient
 
             spring.application.name=user-management-service
-            #enable random port
-            server.port=0
+            server.port=9100
 
             spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
             spring.datasource.username=root
@@ -287,8 +286,7 @@ Java Microservices on Spring Boot and Spring Cloud
             @LoadBalancerClient         along with @FeignClient
 
                 spring.application.name=txn-management-service
-                #enable random port
-                server.port=0
+                server.port=9200
 
                 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
                 spring.datasource.username=root
@@ -316,9 +314,7 @@ Java Microservices on Spring Boot and Spring Cloud
             @LoadBalancerClient         along with @FeignClient
 
                 spring.application.name=reporting-service
-                #enable random port
-                server.port=0
-
+                server.port=9300
 
                 eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
                 eureka.client.initialInstanceInfoReplicationIntervalSeconds=5
@@ -327,3 +323,53 @@ Java Microservices on Spring Boot and Spring Cloud
                 eureka.instance.leaseExpirationDurationInSeconds=5
 
                 spring.cloud.loadbalancer.ribbon.enabled=false
+
+    CaseStudy - BudgetTracker - Implmwentation Step3 - API Gateway 
+    --------------------------------------------------------------------------------------------------
+
+    A. in.budgettracker
+        bt-discovery-service
+                    <no-changes>
+    B. in.budgettracket
+        bt-gateway-service
+            spring boot devtools
+            spring-cloud-starter-netflix-eureka-client
+            spring-cloud-starter-gateway
+
+            @EnableDiscoveryClient      along with @SpringBootAppliction 
+            
+            spring.application.name=gateway-service
+            server.port=9999
+
+            eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+            eureka.client.initialInstanceInfoReplicationIntervalSeconds=5
+            eureka.client.registryFetchIntervalSeconds=5
+            eureka.instance.leaseRenewalIntervalInSeconds=5
+            eureka.instance.leaseExpirationDurationInSeconds=5
+
+            spring.cloud.loadbalancer.ribbon.enabled=false
+
+            # http://localhost:9999/ums/**
+            spring.cloud.gateway.routes[0].id=ums-route
+            spring.cloud.gateway.routes[0].uri=lb://user-management-service
+            spring.cloud.gateway.routes[0].predicates[0]=Path=/ums/**
+
+            # http://localhost:9999/tms/**
+            spring.cloud.gateway.routes[1].id=tms-route
+            spring.cloud.gateway.routes[1].uri=lb://txn-management-service
+            spring.cloud.gateway.routes[1].predicates[0]=Path=/tms/**
+
+            # http://localhost:9999/rs/**
+            spring.cloud.gateway.routes[2].id=rs-route
+            spring.cloud.gateway.routes[2].uri=lb://reporting-service
+            spring.cloud.gateway.routes[2].predicates[0]=Path=/rs/**
+
+     1. in.budgettracker
+        user-management-service
+                    <no-changes>
+     2. in.budgettracker
+        txn-management-service
+                    <no-changes>
+     3. in.budgettracker
+        reporting-service
+                    <no-changes>

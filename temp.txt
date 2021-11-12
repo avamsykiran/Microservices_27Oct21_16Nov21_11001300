@@ -1,5 +1,0 @@
-spring-cloud-starter-loadbalancer
-
-spring.cloud.loadbalancer.ribbon.enabled=false
-
-@LoadBalancerClient(name = "say-hello")
