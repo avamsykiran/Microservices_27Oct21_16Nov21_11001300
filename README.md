@@ -330,6 +330,7 @@ Java Microservices on Spring Boot and Spring Cloud
     A. in.budgettracker
         bt-discovery-service
                     <no-changes>
+
     B. in.budgettracket
         bt-gateway-service
             spring boot devtools
@@ -347,22 +348,10 @@ Java Microservices on Spring Boot and Spring Cloud
             eureka.instance.leaseRenewalIntervalInSeconds=5
             eureka.instance.leaseExpirationDurationInSeconds=5
 
-            spring.cloud.loadbalancer.ribbon.enabled=false
+            management.endpoints.web.exposure.include=*
 
-            # http://localhost:9999/ums/**
-            spring.cloud.gateway.routes[0].id=ums-route
-            spring.cloud.gateway.routes[0].uri=lb://user-management-service
-            spring.cloud.gateway.routes[0].predicates[0]=Path=/ums/**
-
-            # http://localhost:9999/tms/**
-            spring.cloud.gateway.routes[1].id=tms-route
-            spring.cloud.gateway.routes[1].uri=lb://txn-management-service
-            spring.cloud.gateway.routes[1].predicates[0]=Path=/tms/**
-
-            # http://localhost:9999/rs/**
-            spring.cloud.gateway.routes[2].id=rs-route
-            spring.cloud.gateway.routes[2].uri=lb://reporting-service
-            spring.cloud.gateway.routes[2].predicates[0]=Path=/rs/**
+            spring.cloud.gateway.discovery.locator.enabled=true
+            spring.cloud.gateway.discovery.locator.lower-case-service-id=true
 
      1. in.budgettracker
         user-management-service
@@ -373,3 +362,98 @@ Java Microservices on Spring Boot and Spring Cloud
      3. in.budgettracker
         reporting-service
                     <no-changes>
+
+    CaseStudy - BudgetTracker - Implmwentation Step4 - External Configuration using Spring Cloud Config
+    ----------------------------------------------------------------------------------------------------
+
+    A. in.budgettracker
+        bt-discovery-service
+                    <no-changes>
+                    
+    B. in.budgettracket
+        bt-gateway-service
+           ++ spring cloud config client
+           ++ spring-cloud-starter-bootstrap
+
+        bootstrap.properties
+        -----------------------
+           spring.cloud.config.name=bt-gateway-service
+           spring.cloud.config.discovery.service-id=bt-config-service
+           spring.cloud.config.discovery.enabled=true
+ 
+           eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+
+        
+    C. in.budgettracket
+        bt-config-service
+            spring boot dev tools
+            spring cloud config server
+            spring cloud eureka eureka client
+
+        @EnableConfigServer         along with @SpringBootApplication
+        @EnableDiscoveryClient      along with @SpringBootApplication
+
+        create  folder 'btrepo'
+        create btrepo/bt-gateway-service.properties         contains bt-gateway-service/applocation.properties
+        create btrepo/user-management-service.properties    contains user-management-service/applocation.properties
+        create btrepo/txn-management-service.properties     contains txn-management-service/applocation.properties
+        create btrepo/reporting-service.properties          contains reporting-service/applocation.properties
+
+            cd btrepo
+            git init
+            git add .
+            git commit -m "configs created"
+
+            spring.application.name=bt-config-service
+            server.port=9090
+
+            spring.cloud.config.server.git.uri=file:///F:/IIHT/Cognizent/DTP_2021/ongoing/Microservices_27Oct21_16Nov21_11001300/BudgetTrackerMicroservicesStep4/btrepo
+
+            eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+            eureka.client.initialInstanceInfoReplicationIntervalSeconds=5
+            eureka.client.registryFetchIntervalSeconds=5
+            eureka.instance.leaseRenewalIntervalInSeconds=5
+            eureka.instance.leaseExpirationDurationInSeconds=5
+
+
+
+     1. in.budgettracker
+        user-management-service
+             ++ spring cloud config client
+             ++ spring-cloud-starter-bootstrap
+
+        bootstrap.properties
+        -----------------------
+           spring.cloud.config.name=user-management-service
+           spring.cloud.config.discovery.service-id=bt-config-service
+           spring.cloud.config.discovery.enabled=true
+ 
+           eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+
+     2. in.budgettracker
+        txn-management-service
+             ++ spring cloud config client
+             ++ spring-cloud-starter-bootstrap
+
+        
+        bootstrap.properties
+        -----------------------
+           spring.cloud.config.name=txn-management-service
+           spring.cloud.config.discovery.service-id=bt-config-service
+           spring.cloud.config.discovery.enabled=true
+ 
+           eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+
+
+     3. in.budgettracker
+        reporting-service
+             ++ spring cloud config client
+             ++ spring-cloud-starter-bootstrap
+
+        bootstrap.properties
+        -----------------------
+           spring.cloud.config.name=reporting-service
+           spring.cloud.config.discovery.service-id=bt-config-service
+           spring.cloud.config.discovery.enabled=true
+ 
+           eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
