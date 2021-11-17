@@ -457,3 +457,70 @@ Java Microservices on Spring Boot and Spring Cloud
            spring.cloud.config.discovery.enabled=true
  
            eureka.client.serviceUrl.defaultZone=http://localhost:9000/eureka/
+
+    CaseStudy - BudgetTracker - Implmwentation Step5 - Distributed Tracing And Log Aggregation- Sleuth and Zipkin
+    --------------------------------------------------------------------------------------------------------------
+
+    A. in.budgettracker
+        bt-discovery-service
+                    <no-changes>
+                    
+    B. in.budgettracker
+        bt-gateway-service
+        ++spring boot actuator
+        ++spring cloud starter sleuth  
+        ++spring cloud starter zipkin
+
+        management.endpoints.web.exposure.include=*         in btrepo/user-management-service.proeprties
+           
+        @Bean
+        public Sampler defautlSampler(){
+            return Sampler.ALWAYS_SAMPLE;
+        }
+        
+    C. in.budgettracker
+        bt-config-service
+    
+    D. Zipkin-Server
+        download from https://search.maven.org/remote_content?g=io.zipkin&a=zipkin-server&v=LATEST&c=exec
+        execute it as:
+            java -jar zipkin-**versionFileName.jar
+
+     1. in.budgettracker
+        user-management-service
+        ++spring boot actuator
+        ++spring cloud starter sleuth
+        ++spring cloud starter zipkin
+
+        management.endpoints.web.exposure.include=*         in btrepo/user-management-service.proeprties
+           
+        @Bean
+        public Sampler defautlSampler(){
+            return Sampler.ALWAYS_SAMPLE;
+        }
+
+     2. in.budgettracker
+        txn-management-service
+        ++spring boot actuator
+        ++spring cloud starter sleuth
+        ++spring cloud starter zipkin
+
+        management.endpoints.web.exposure.include=*         in btrepo/user-management-service.proeprties
+           
+        @Bean
+        public Sampler defautlSampler(){
+            return Sampler.ALWAYS_SAMPLE;
+        }
+
+     3. in.budgettracker
+        reporting-service
+        ++spring boot actuator
+        ++spring cloud starter sleuth     
+        ++spring cloud starter zipkin
+
+        management.endpoints.web.exposure.include=*         in btrepo/user-management-service.proeprties
+           
+        @Bean
+        public Sampler defautlSampler(){
+            return Sampler.ALWAYS_SAMPLE;
+        }
